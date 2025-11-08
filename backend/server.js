@@ -4,6 +4,7 @@ import cors from "cors";
 import dotenv from "dotenv";
 import { connectDB } from "./config/db.js";
 import authRoutes from "./routes/authRoutes.js";
+import moodRoutes from "./routes/moodRoutes.js";
 
 // Load environment variables from .env file
 dotenv.config();
@@ -15,8 +16,8 @@ const app = express();
 // Allow JSON requests and cross-origin access
 app.use(express.json());
 app.use(cors());
-
 app.use("/api/auth", authRoutes);
+app.use("/api/moods", moodRoutes);
 
 // Create first route
 app.get("/", (req,res) => {
