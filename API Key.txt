@@ -1,0 +1,2 @@
+Use this key in your application by passing it with the key=API_KEY parameter.
+AIzaSyDh1kLchmsEPkH9AhJIg4d3SKV1dquocAY

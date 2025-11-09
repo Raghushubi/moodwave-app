@@ -1,0 +1,5 @@
+{
+  "javascript.validate.enable": false,
+  "javascript.suggest.autoImports": true,
+  "javascript.preferences.importModuleSpecifier": "relative"
+}
