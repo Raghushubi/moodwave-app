@@ -9,7 +9,7 @@ import { connectDB } from "./config/db.js";
 // Import routes
 import authRoutes from "./routes/authRoutes.js";
 import moodRoutes from "./routes/moodRoutes.js";
-import musicRoutes from "../routes/musicRoutes.js";
+import musicRoutes from "./routes/musicRoutes.js";
 
 // Initialize environment variables
 dotenv.config();
