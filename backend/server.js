@@ -1,33 +1,47 @@
-// Import thee libraries we installed
+// Import required libraries
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
+
+// Import MongoDB connection function (from Raghu’s config)
 import { connectDB } from "./config/db.js";
+
+// Import routes
 import authRoutes from "./routes/authRoutes.js";
 import moodRoutes from "./routes/moodRoutes.js";
+import musicRoutes from "./routes/musicRoutes.js";
 
-// Load environment variables from .env file
+// Initialize environment variables
 dotenv.config();
+
+// Connect to MongoDB Atlas
 connectDB();
 
-// Create an express app
+// Initialize Express app
 const app = express();
 
-// Allow JSON requests and cross-origin access
-app.use(express.json());
-app.use(cors());
-app.use("/api/auth", authRoutes);
-app.use("/api/moods", moodRoutes);
+// Middleware
+app.use(express.json()); // Parse JSON request bodies
+app.use(cors()); // Allow requests from frontend
 
-// Create first route
-app.get("/", (req,res) => {
-    res.send("MoodWave backend is running!");
+// Base routes
+app.use("/api/auth", authRoutes);   // Authentication routes 
+app.use("/api/moods", moodRoutes);  // Mood & MoodLog routes 
+app.use("/api/music", musicRoutes); // Music Recommendation routes
+
+// Default route (root)
+app.get("/", (req, res) => {
+  res.send("MoodWave backend is running!");
 });
 
-// Tell the server which port to listen on
+// Set port from environment or fallback to 5000
 const PORT = process.env.PORT || 5000;
 
-// Start the server
+// Start server
 app.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
+  console.log(`Server is running on http://localhost:${PORT}`);
 });
+
+console.log("Music routes mounted successfully");
+app.use("/api/music", musicRoutes);
+

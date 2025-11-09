@@ -10,5 +10,5 @@ const moodSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-const Mood = mongoose.model("Mood", moodSchema);
-export default Mood;
+// Safe export (prevents OverwriteModelError)
+export default mongoose.models.Mood || mongoose.model("Mood", moodSchema);
