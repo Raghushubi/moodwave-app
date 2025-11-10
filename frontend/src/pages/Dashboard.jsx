@@ -11,67 +11,58 @@ export default function Dashboard() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // 🔹 Load moods on mount
+  const userId = localStorage.getItem("userId");
+
+  // 🔹 Load moods
   useEffect(() => {
     API.get("/moods")
       .then((res) => setMoods(res.data))
-      .catch((err) => {
-        console.error("Error loading moods:", err);
-        setMessage("Failed to load moods");
-      });
+      .catch(() => setMessage("Failed to load moods"));
   }, []);
 
-  // 🔹 If redirected from DetectMood with moodId, auto-fetch music
+  // 🔹 If redirected from DetectMood
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const moodId = params.get("moodId");
     if (moodId) {
       fetchMusic(moodId);
       setMessage("Loaded songs for detected mood");
-      // remove query string from URL (optional)
-      // navigate("/dashboard", { replace: true });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.search]);
 
-  // 🔹 Manual mood selection handler (logs and fetches songs)
+  // 🔹 Manual mood select
   const handleManualSelect = async (moodId) => {
-    try {
-      const userId = localStorage.getItem("userId");
-      if (!userId) {
-        setMessage("⚠ Please log in first!");
-        return;
-      }
+    if (!userId) {
+      setMessage("You’re not logged in — showing songs only (not logged).");
+      fetchMusic(moodId);
+      return;
+    }
 
+    try {
       await API.post("/moods/log", {
         userId,
         moodId,
         method: "Manual",
         confidence: 1.0,
       });
-
       setMessage("✅ Mood logged manually!");
       fetchMusic(moodId);
-    } catch (err) {
-      console.error("Error logging mood:", err);
+    } catch {
       setMessage("❌ Failed to log mood");
     }
   };
 
-  // 🔹 Fetch music from backend (Varun's API)
+  // 🔹 Fetch music
   const fetchMusic = async (moodId) => {
     try {
       setLoading(true);
-      setSongs([]); // clear previous
-      setMessage("");
+      setSongs([]);
       const res = await API.get(`/music/${moodId}`);
-      // res.data.songs expected
       setSongs(res.data.songs || []);
       if (!res.data.songs || res.data.songs.length === 0) {
         setMessage("No songs found for this mood.");
       }
-    } catch (err) {
-      console.error("Error fetching songs:", err);
+    } catch {
       setMessage("❌ Failed to fetch songs");
     } finally {
       setLoading(false);
@@ -80,9 +71,11 @@ export default function Dashboard() {
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
-      {/* Header */}
+      {/* Header Section */}
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold text-blue-700">🌊 MoodWave Dashboard</h1>
+        <h1 className="text-3xl font-bold text-blue-700">
+          🌊 MoodWave Dashboard
+        </h1>
 
         <div className="flex gap-3">
           <button
@@ -92,16 +85,18 @@ export default function Dashboard() {
             🎥 Webcam Detection
           </button>
 
-          <button
-            onClick={() => navigate("/profile")}
-            className="bg-white border border-gray-300 px-4 py-2 rounded-lg shadow hover:shadow-md transition"
-          >
-            👤 Profile
-          </button>
+          {userId && (
+            <button
+              onClick={() => navigate("/profile")}
+              className="bg-white border border-gray-300 px-4 py-2 rounded-lg shadow hover:shadow-md transition"
+            >
+              👤 Profile
+            </button>
+          )}
         </div>
       </div>
 
-      {/* Message */}
+      {/* Messages */}
       {message && (
         <p className="text-center mb-4 font-medium text-green-600">{message}</p>
       )}
@@ -126,33 +121,52 @@ export default function Dashboard() {
 
       {/* Recommended Songs */}
       <div className="bg-white p-4 rounded-xl shadow-md">
-        <h2 className="text-xl font-semibold mb-3 text-blue-600">🎵 Recommended Songs</h2>
+        <h2 className="text-xl font-semibold mb-3 text-blue-600">
+          🎵 Recommended Songs
+        </h2>
 
         {loading && <p>Loading songs...</p>}
 
         {!loading && songs.length === 0 && (
-          <p className="text-gray-500">Select a mood or use webcam detection to get songs 🎧</p>
+          <p className="text-gray-500">
+            Select a mood or use webcam detection to get songs 🎧
+          </p>
         )}
 
         <ul className="space-y-2">
           {songs.map((s, i) => (
             <li key={i} className="border-b py-2 flex items-center gap-3">
-              {/* optional thumbnail */}
               {s.thumbnail && (
-                // keep thumbnail small and rounded
-                <img src={s.thumbnail} alt="thumb" width="56" height="56" className="rounded-md" />
+                <img
+                  src={s.thumbnail}
+                  alt="thumb"
+                  width="56"
+                  height="56"
+                  className="rounded-md"
+                />
               )}
-
               <div className="flex-1">
-                <a href={s.url} target="_blank" rel="noopener noreferrer" className="text-blue-700 hover:underline">
+                <a
+                  href={s.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-700 hover:underline"
+                >
                   {s.title}
                 </a>
-                {s.channelTitle && <div className="text-sm text-gray-500">{s.channelTitle}</div>}
+                {s.channelTitle && (
+                  <div className="text-sm text-gray-500">
+                    {s.channelTitle}
+                  </div>
+                )}
               </div>
-
               <div>
-                {/* Favorite / like buttons could go here later */}
-                <a href={s.url} target="_blank" rel="noopener noreferrer" className="text-sm text-gray-600 hover:text-blue-600">
+                <a
+                  href={s.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-sm text-gray-600 hover:text-blue-600"
+                >
                   ▶ Play
                 </a>
               </div>

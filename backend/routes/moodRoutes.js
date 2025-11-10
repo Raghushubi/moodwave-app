@@ -8,3 +8,4 @@ router.post("/log", logMood);
 router.get("/user/:userId/history", getUserMoodHistory); // optional helper
 
 export default router;
+

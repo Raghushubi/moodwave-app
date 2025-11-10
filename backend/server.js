@@ -11,7 +11,7 @@ import authRoutes from "./routes/authRoutes.js";
 import moodRoutes from "./routes/moodRoutes.js";
 import musicRoutes from "./routes/musicRoutes.js";
 import analyticsRoutes from "./routes/analyticsRoutes.js";
-
+import userRoutes from "./routes/userRoutes.js";
 
 // Initialize environment variables
 dotenv.config();
@@ -31,6 +31,7 @@ app.use("/api/auth", authRoutes);   // Authentication routes
 app.use("/api/moods", moodRoutes);  // Mood & MoodLog routes 
 app.use("/api/music", musicRoutes); // Music Recommendation routes
 app.use("/api/analytics", analyticsRoutes);
+app.use("/api/users", userRoutes);
 
 // Default route (root)
 app.get("/", (req, res) => {
