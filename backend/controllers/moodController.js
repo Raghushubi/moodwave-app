@@ -1,0 +1,52 @@
+// backend/controllers/moodController.js
+import Mood from "../models/Mood.js";
+import MoodLog from "../models/MoodLog.js";
+
+// ✅ Get all moods
+export const getMoods = async (req, res) => {
+  try {
+    const moods = await Mood.find().sort({ name: 1 });
+    res.json(moods);
+  } catch (error) {
+    console.error("getMoods error:", error);
+    res.status(500).json({ message: "Error fetching moods" });
+  }
+};
+
+// ✅ Log a new mood
+export const logMood = async (req, res) => {
+  try {
+    const { userId, moodId, method, confidence } = req.body;
+
+    if (!userId || !moodId) {
+      return res.status(400).json({ message: "userId and moodId are required" });
+    }
+
+    const newLog = await MoodLog.create({
+      user: userId,
+      mood: moodId,
+      method: method || "Manual",
+      confidence: typeof confidence === "number" ? confidence : null,
+    });
+
+    res.status(201).json(newLog);
+  } catch (error) {
+    console.error("logMood error:", error);
+    res.status(500).json({ message: "Error logging mood" });
+  }
+};
+
+// ✅ Get mood history for a user
+export const getUserMoodHistory = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const logs = await MoodLog.find({ user: userId })
+      .populate("mood", "name colorCode icon")
+      .sort({ timestamp: -1 })
+      .limit(100);
+    res.json(logs);
+  } catch (error) {
+    console.error("getUserMoodHistory error:", error);
+    res.status(500).json({ message: "Error fetching mood history" });
+  }
+};
