@@ -1,10 +1,12 @@
 import React, { useEffect, useRef, useState } from "react";
 import { detectMood } from "../utils/moodDetection";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 export default function DetectMood() {
   const videoRef = useRef();
   const [result, setResult] = useState(null);
+  const navigate = useNavigate(); // 👈 for redirecting to Dashboard
 
   useEffect(() => {
     // Access webcam
@@ -19,26 +21,58 @@ export default function DetectMood() {
   }, []);
 
   const handleConfirm = async () => {
-    const userId = "690d1759a2ffc4c1f4caefef"; // test user from backend
-    const moodId = "690f0091e04b38a3ffe7d4b6"; // example (Happy)
+    try {
+      const userId = localStorage.getItem("userId"); // ✅ use real logged-in user
+      if (!userId) {
+        alert("⚠ Please log in first!");
+        return;
+      }
 
-    await axios.post("http://localhost:5000/api/moods/log", {
-      userId,
-      moodId,
-      method: "Webcam",
-      confidence: result.confidence
-    });
+      // Fetch moods from backend
+      const { data: moods } = await axios.get("http://localhost:5000/api/moods");
+      const matchedMood = moods.find((m) =>
+        m.name.toLowerCase().includes(result.emotion.toLowerCase())
+      );
 
-    alert("Mood logged successfully!");
+      if (!matchedMood) {
+        alert("❌ Mood not recognized in database!");
+        return;
+      }
+
+      // Log the detected mood
+      await axios.post("http://localhost:5000/api/moods/log", {
+        userId,
+        moodId: matchedMood._id,
+        method: "Webcam",
+        confidence: result.confidence,
+      });
+
+      alert(`✅ Mood "${matchedMood.name}" logged successfully!`);
+
+      // ✅ Redirect to Dashboard, sending moodId
+      navigate(`/dashboard?moodId=${matchedMood._id}`);
+    } catch (err) {
+      console.error("Error logging mood:", err);
+      alert("❌ Error logging mood!");
+    }
   };
 
   return (
     <div className="p-4 flex flex-col items-center">
       <h1 className="text-2xl font-bold mb-2">Webcam Mood Detection</h1>
-      <video ref={videoRef} autoPlay muted width="400" height="300" className="rounded-lg shadow-md" />
+      <video
+        ref={videoRef}
+        autoPlay
+        muted
+        width="400"
+        height="300"
+        className="rounded-lg shadow-md"
+      />
       {result && (
         <div className="mt-4 text-center">
-          <p className="text-lg">Mood: <b>{result.emotion}</b></p>
+          <p className="text-lg">
+            Mood: <b>{result.emotion}</b>
+          </p>
           <p>Confidence: {(result.confidence * 100).toFixed(1)}%</p>
           <button
             onClick={handleConfirm}

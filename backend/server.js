@@ -10,6 +10,8 @@ import { connectDB } from "./config/db.js";
 import authRoutes from "./routes/authRoutes.js";
 import moodRoutes from "./routes/moodRoutes.js";
 import musicRoutes from "./routes/musicRoutes.js";
+import analyticsRoutes from "./routes/analyticsRoutes.js";
+
 
 // Initialize environment variables
 dotenv.config();
@@ -28,6 +30,7 @@ app.use(cors()); // Allow requests from frontend
 app.use("/api/auth", authRoutes);   // Authentication routes 
 app.use("/api/moods", moodRoutes);  // Mood & MoodLog routes 
 app.use("/api/music", musicRoutes); // Music Recommendation routes
+app.use("/api/analytics", analyticsRoutes);
 
 // Default route (root)
 app.get("/", (req, res) => {

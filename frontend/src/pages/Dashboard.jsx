@@ -1,37 +1,165 @@
+// frontend/src/pages/Dashboard.jsx
 import { useEffect, useState } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import API from "../utils/api";
 
-function Dashboard() {
+export default function Dashboard() {
   const [moods, setMoods] = useState([]);
+  const [songs, setSongs] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState("");
+  const navigate = useNavigate();
+  const location = useLocation();
 
+  // 🔹 Load moods on mount
   useEffect(() => {
-    const fetchMoods = async () => {
-      try {
-        const response = await API.get("/moods"); // this calls backend route /api/moods
-        setMoods(response.data);
-      } catch (error) {
-        console.error("Error fetching moods:", error);
-      }
-    };
-    fetchMoods();
+    API.get("/moods")
+      .then((res) => setMoods(res.data))
+      .catch((err) => {
+        console.error("Error loading moods:", err);
+        setMessage("Failed to load moods");
+      });
   }, []);
 
+  // 🔹 If redirected from DetectMood with moodId, auto-fetch music
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const moodId = params.get("moodId");
+    if (moodId) {
+      fetchMusic(moodId);
+      setMessage("Loaded songs for detected mood");
+      // remove query string from URL (optional)
+      // navigate("/dashboard", { replace: true });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location.search]);
+
+  // 🔹 Manual mood selection handler (logs and fetches songs)
+  const handleManualSelect = async (moodId) => {
+    try {
+      const userId = localStorage.getItem("userId");
+      if (!userId) {
+        setMessage("⚠ Please log in first!");
+        return;
+      }
+
+      await API.post("/moods/log", {
+        userId,
+        moodId,
+        method: "Manual",
+        confidence: 1.0,
+      });
+
+      setMessage("✅ Mood logged manually!");
+      fetchMusic(moodId);
+    } catch (err) {
+      console.error("Error logging mood:", err);
+      setMessage("❌ Failed to log mood");
+    }
+  };
+
+  // 🔹 Fetch music from backend (Varun's API)
+  const fetchMusic = async (moodId) => {
+    try {
+      setLoading(true);
+      setSongs([]); // clear previous
+      setMessage("");
+      const res = await API.get(`/music/${moodId}`);
+      // res.data.songs expected
+      setSongs(res.data.songs || []);
+      if (!res.data.songs || res.data.songs.length === 0) {
+        setMessage("No songs found for this mood.");
+      }
+    } catch (err) {
+      console.error("Error fetching songs:", err);
+      setMessage("❌ Failed to fetch songs");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <div className="p-8 bg-gray-900 min-h-screen text-white">
-      <h1 className="text-3xl font-bold mb-6 text-happy">Mood Dashboard 🎭</h1>
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        {moods.map((mood) => (
-          <div
-            key={mood._id}
-            className="p-6 rounded-xl bg-gray-800 shadow-lg hover:scale-105 transition-transform"
+    <div className="p-6 bg-gray-50 min-h-screen">
+      {/* Header */}
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-3xl font-bold text-blue-700">🌊 MoodWave Dashboard</h1>
+
+        <div className="flex gap-3">
+          <button
+            onClick={() => navigate("/detect-mood")}
+            className="bg-purple-600 text-white px-5 py-2 rounded-lg font-semibold shadow hover:bg-purple-700 transition"
           >
-            <h2 className="text-2xl font-semibold text-happy">{mood.name}</h2>
-            <p className="mt-2 text-gray-300">{mood.description}</p>
-          </div>
-        ))}
+            🎥 Webcam Detection
+          </button>
+
+          <button
+            onClick={() => navigate("/profile")}
+            className="bg-white border border-gray-300 px-4 py-2 rounded-lg shadow hover:shadow-md transition"
+          >
+            👤 Profile
+          </button>
+        </div>
+      </div>
+
+      {/* Message */}
+      {message && (
+        <p className="text-center mb-4 font-medium text-green-600">{message}</p>
+      )}
+
+      {/* Manual Mood Selection */}
+      <div className="mb-8">
+        <h2 className="text-xl font-semibold mb-3">🎛️ Manual Mood Selection</h2>
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          {moods.map((mood) => (
+            <button
+              key={mood._id}
+              onClick={() => handleManualSelect(mood._id)}
+              className="p-4 rounded-xl text-white font-semibold shadow-md hover:scale-105 transition-transform flex flex-col items-center gap-2"
+              style={{ backgroundColor: mood.colorCode }}
+            >
+              <div className="text-2xl">{mood.icon}</div>
+              <div>{mood.name}</div>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Recommended Songs */}
+      <div className="bg-white p-4 rounded-xl shadow-md">
+        <h2 className="text-xl font-semibold mb-3 text-blue-600">🎵 Recommended Songs</h2>
+
+        {loading && <p>Loading songs...</p>}
+
+        {!loading && songs.length === 0 && (
+          <p className="text-gray-500">Select a mood or use webcam detection to get songs 🎧</p>
+        )}
+
+        <ul className="space-y-2">
+          {songs.map((s, i) => (
+            <li key={i} className="border-b py-2 flex items-center gap-3">
+              {/* optional thumbnail */}
+              {s.thumbnail && (
+                // keep thumbnail small and rounded
+                <img src={s.thumbnail} alt="thumb" width="56" height="56" className="rounded-md" />
+              )}
+
+              <div className="flex-1">
+                <a href={s.url} target="_blank" rel="noopener noreferrer" className="text-blue-700 hover:underline">
+                  {s.title}
+                </a>
+                {s.channelTitle && <div className="text-sm text-gray-500">{s.channelTitle}</div>}
+              </div>
+
+              <div>
+                {/* Favorite / like buttons could go here later */}
+                <a href={s.url} target="_blank" rel="noopener noreferrer" className="text-sm text-gray-600 hover:text-blue-600">
+                  ▶ Play
+                </a>
+              </div>
+            </li>
+          ))}
+        </ul>
       </div>
     </div>
   );
 }
-
-export default Dashboard;
