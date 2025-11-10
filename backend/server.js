@@ -7,6 +7,7 @@ import dotenv from "dotenv";
 import { connectDB } from "./config/db.js";
 
 // Import routes
+import matchRoutes from "./routes/matchRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
 import moodRoutes from "./routes/moodRoutes.js";
 import musicRoutes from "./routes/musicRoutes.js";
@@ -32,6 +33,7 @@ app.use("/api/moods", moodRoutes);  // Mood & MoodLog routes
 app.use("/api/music", musicRoutes); // Music Recommendation routes
 app.use("/api/analytics", analyticsRoutes);
 app.use("/api/users", userRoutes);
+app.use("/api/match", matchRoutes);
 
 // Default route (root)
 app.get("/", (req, res) => {
