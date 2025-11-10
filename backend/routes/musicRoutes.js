@@ -1,9 +1,9 @@
 import express from "express";
-import { getMusicByMood } from "../controllers/musicController.js";
+import { getMusicByMood, postMusicFeedback } from "../controllers/musicController.js";
 
 const router = express.Router();
 
-// GET /api/music/:moodId → fetch YouTube songs for given mood
 router.get("/:moodId", getMusicByMood);
+router.post("/feedback", postMusicFeedback);
 
 export default router;
