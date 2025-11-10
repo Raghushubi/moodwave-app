@@ -50,3 +50,31 @@ export const getUserMoodHistory = async (req, res) => {
     res.status(500).json({ message: "Error fetching mood history" });
   }
 };
+
+export const getSocialMatches = async (req, res) => {
+  try {
+    const { mood, interests } = req.body;
+
+    // Temporary simulated data (later you can connect to actual user collection)
+    const users = [
+      { name: "Aarav", mood: "happy", interests: ["travel", "music"] },
+      { name: "Meera", mood: "calm", interests: ["books", "art"] },
+      { name: "Rohan", mood: "sad", interests: ["movies", "writing"] },
+      { name: "Greeshmitha", mood: "happy", interests: ["music", "dance"] },
+    ];
+
+    // Filter users by matching mood or overlapping interests
+    const matches = users.filter(
+      (u) => u.mood === mood || u.interests.some((i) => interests.includes(i))
+    );
+
+    res.status(200).json({
+      success: true,
+      count: matches.length,
+      matches,
+    });
+  } catch (error) {
+    console.error("getSocialMatches error:", error);
+    res.status(500).json({ success: false, message: "Error finding matches" });
+  }
+};
