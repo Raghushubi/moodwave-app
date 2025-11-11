@@ -6,33 +6,6 @@ MoodWave is a full-stack emotion-aware web application that detects a user's moo
 
 This repository contains the **complete source code** for both backend (Node.js + Express + MongoDB) and frontend (React.js + Tailwind CSS) components of the MoodWave application.
 
-## 🧩 Project Structure
-
-```
-moodwave-app/
-├── backend/
-│   ├── controllers/
-│   ├── models/
-│   ├── routes/
-│   ├── services/
-│   ├── .env.example
-│   ├── package.json
-│   └── server.js
-│
-├── frontend/
-│   ├── public/
-│   ├── src/
-│   │   ├── components/
-│   │   ├── pages/
-│   │   ├── utils/
-│   │   ├── App.jsx
-│   │   └── index.js
-│   ├── package.json
-│   └── tailwind.config.js
-│
-└── README.md
-```
-
 ## 🧠 Key Features
 
 - 🎭 AI-based webcam mood detection and manual mood selection
