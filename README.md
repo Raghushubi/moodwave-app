@@ -1,4 +1,4 @@
-# 🌊 MoodWave – Emotion-Based Music Recommendation System
+# 🌊 MoodWave – Personalized Mood-Based Music Companion Platform
 
 MoodWave is a full-stack emotion-aware web application that detects a user's mood (via webcam or manual selection) and generates personalized music playlists accordingly. It integrates AI-based emotion detection, RESTful APIs, and dynamic YouTube playlist generation to enhance mental well-being through music.
 
@@ -135,7 +135,7 @@ Frontend runs on **http://localhost:5173**
 
 | Name | Role |
 |------|------|
-| Raghu Shubhangi | Backend Maintainer & Coordinator |
+| Raghu Shubhangi | Authentication & System Integration |
 | Varun Chaitanya | Music Feedback & Recommendation System |
 | Nandana Renjith | AI Mood Detection Refinement |
 | Greeshmitha Sai | Analytics & Social Matching |
