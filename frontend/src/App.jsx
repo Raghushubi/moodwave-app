@@ -5,6 +5,7 @@ import Dashboard from "./pages/Dashboard";
 import DetectMood from "./pages/DetectMood";
 import Friends from "./pages/Friends";
 import Analytics from "./pages/Analytics";
+import Playlists from "./pages/Playlists";
 import Profile from "./pages/Profile";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
@@ -20,6 +21,7 @@ export default function App() {
         <Route path="/detect-mood" element={<DetectMood />} />
         <Route path="/friends" element={<Friends />} />
         <Route path="/analytics" element={<Analytics />} />
+        <Route path="/playlists" element={<Playlists />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
