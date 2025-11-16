@@ -9,7 +9,7 @@ export default function MoodLogs() {
   useEffect(() => {
     const userId = localStorage.getItem("userId");
     if (!userId) {
-      setMessage("⚠ Please log in to view your mood history.");
+      setMessage("Please log in to view your mood history.");
       setLoading(false);
       return;
     }
@@ -21,7 +21,7 @@ export default function MoodLogs() {
       })
       .catch((err) => {
         console.error("Error fetching mood logs:", err);
-        setMessage("❌ Failed to load mood history.");
+        setMessage("Failed to load mood history.");
         setLoading(false);
       });
   }, []);
@@ -39,27 +39,28 @@ export default function MoodLogs() {
   }
 
   return (
-    <div className="p-6 bg-gray-50 min-h-screen">
-      <h1 className="text-2xl font-bold text-blue-700 mb-4">
-        🗓️ Your Mood History
-      </h1>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 p-6">
+      <div className="max-w-6xl mx-auto">
+        <h1 className="text-3xl font-bold text-blue-700 mb-6">
+          Your Mood History
+        </h1>
 
-      {logs.length === 0 ? (
-        <p className="text-gray-500">No moods logged yet.</p>
-      ) : (
-        <div className="overflow-x-auto">
-          <table className="min-w-full bg-white border border-gray-200 rounded-lg shadow-md">
-            <thead>
-              <tr className="bg-blue-100 text-blue-700">
-                <th className="py-2 px-4 text-left">Mood(s)</th>
-                <th className="py-2 px-4 text-left">Method</th>
-                <th className="py-2 px-4 text-left">Confidence</th>
-                <th className="py-2 px-4 text-left">Logged On</th>
-              </tr>
-            </thead>
+        {logs.length === 0 ? (
+          <p className="text-gray-500">No moods logged yet.</p>
+        ) : (
+          <div className="overflow-x-auto bg-white rounded-2xl shadow-xl">
+            <table className="min-w-full">
+              <thead>
+                <tr className="bg-gradient-to-r from-blue-100 to-blue-50 text-blue-700">
+                  <th className="py-3 px-6 text-left font-semibold">Mood(s)</th>
+                  <th className="py-3 px-6 text-left font-semibold">Method</th>
+                  <th className="py-3 px-6 text-left font-semibold">Confidence</th>
+                  <th className="py-3 px-6 text-left font-semibold">Logged On</th>
+                </tr>
+              </thead>
 
-            <tbody>
-              {logs.map((log, i) => {
+              <tbody>
+                {logs.map((log, i) => {
                 const moodList = [];
 
                 // Handle single mood logs
@@ -72,56 +73,51 @@ export default function MoodLogs() {
                   moodList.push(...log.moods);
                 }
 
-                return (
-                  <tr
-                    key={i}
-                    className="border-t hover:bg-blue-50 transition duration-150"
-                  >
-                    {/* Moods */}
-                    <td className="py-2 px-4">
-                      {moodList.length > 0 ? (
-                        <div className="flex flex-wrap gap-2">
-                          {moodList.map((m, idx) => (
-                            <span
-                              key={idx}
-                              className="px-2 py-1 rounded-lg text-sm font-medium shadow-sm"
-                              style={{
-                                backgroundColor: m.colorCode || "#eee",
-                                color: "#fff",
-                              }}
-                            >
-                              {m.icon} {m.name}
-                            </span>
-                          ))}
-                        </div>
-                      ) : (
-                        <span className="text-gray-400">Unknown</span>
-                      )}
-                    </td>
+                  return (
+                    <tr
+                      key={i}
+                      className="border-t border-gray-100 hover:bg-blue-50 transition"
+                    >
+                      <td className="py-3 px-6">
+                        {moodList.length > 0 ? (
+                          <div className="flex flex-wrap gap-2">
+                            {moodList.map((m, idx) => (
+                              <span
+                                key={idx}
+                                className="px-3 py-1 rounded-lg text-sm font-medium shadow-sm"
+                                style={{
+                                  backgroundColor: m.colorCode || "#eee",
+                                  color: "#fff",
+                                }}
+                              >
+                                {m.icon} {m.name}
+                              </span>
+                            ))}
+                          </div>
+                        ) : (
+                          <span className="text-gray-400">Unknown</span>
+                        )}
+                      </td>
 
-                    {/* Method */}
-                    <td className="py-2 px-4">{log.method || "—"}</td>
-
-                    {/* Confidence */}
-                    <td className="py-2 px-4">
-                      {log.confidence
-                        ? `${(log.confidence * 100).toFixed(1)}%`
-                        : "—"}
-                    </td>
-
-                    {/* Date */}
-                    <td className="py-2 px-4">
-                      {log.timestamp
-                        ? new Date(log.timestamp).toLocaleString()
-                        : "—"}
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-      )}
+                      <td className="py-3 px-6 text-gray-700">{log.method || "—"}</td>
+                      <td className="py-3 px-6 text-gray-700">
+                        {log.confidence
+                          ? `${(log.confidence * 100).toFixed(1)}%`
+                          : "—"}
+                      </td>
+                      <td className="py-3 px-6 text-gray-600 text-sm">
+                        {log.timestamp
+                          ? new Date(log.timestamp).toLocaleString()
+                          : "—"}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

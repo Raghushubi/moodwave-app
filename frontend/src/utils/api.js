@@ -1,8 +1,18 @@
 import axios from "axios";
 
-// This connects React (frontend) to your backend server
 const API = axios.create({
-  baseURL: "http://localhost:5000/api",  // backend base URL
+  baseURL: import.meta.env.VITE_API_BASE || "http://localhost:5000/api",
 });
+
+API.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
 
 export default API;
