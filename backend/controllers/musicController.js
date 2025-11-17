@@ -1,10 +1,18 @@
+// backend/controllers/musicController.js
 import Mood from "../models/Mood.js";
 import { getYouTubeSongs } from "../services/youtubeService.js";
+import mongoose from "mongoose";
 
 // 🎵 Fetch songs for a single mood
 export const getMusicByMood = async (req, res) => {
   try {
     const moodId = req.params.moodId;
+
+    // Validate incoming moodId BEFORE calling Mongoose
+    if (!mongoose.Types.ObjectId.isValid(moodId)) {
+      return res.status(400).json({ message: "Invalid mood id" });
+    }
+
     const mood = await Mood.findById(moodId);
 
     if (!mood) {
@@ -27,7 +35,7 @@ export const getCombinedMusic = async (req, res) => {
       return res.status(400).json({ message: "Missing moods parameter" });
     }
 
-    const moodList = moodsParam.split(",");
+    const moodList = moodsParam.split(",").map(s => s.trim()).filter(Boolean);
     console.log("🎧 Generating combined playlist for:", moodList);
 
     // Fetch songs for each mood (parallel)

@@ -1,53 +1,72 @@
-// Import required libraries
+// ----------------------
+// Load Environment Variables
+// ----------------------
+import dotenv from "dotenv";
+dotenv.config();
+
+// ----------------------
+// Import Libraries
+// ----------------------
 import express from "express";
 import cors from "cors";
-import dotenv from "dotenv";
 
-// Import MongoDB connection function (from Raghu’s config)
+// ----------------------
+// Import DB Connection
+// ----------------------
 import { connectDB } from "./config/db.js";
 
-// Import routes
+// ----------------------
+// Import Routes
+// ----------------------
 import authRoutes from "./routes/authRoutes.js";
 import moodRoutes from "./routes/moodRoutes.js";
+import chatbotRoutes from "./routes/chatbotRoutes.js";
 import musicRoutes from "./routes/musicRoutes.js";
 import analyticsRoutes from "./routes/analyticsRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 import playlistRoutes from "./routes/playlistRoutes.js";
 
-// Initialize environment variables
-dotenv.config();
-
-// Connect to MongoDB Atlas
-connectDB();
-
-// Initialize Express app
+// ----------------------
+// Initialize App
+// ----------------------
 const app = express();
 
+// ----------------------
 // Middleware
-app.use(express.json()); // Parse JSON request bodies
-app.use(cors()); // Allow requests from frontend
+// ----------------------
+app.use(express.json());
+app.use(cors());
 
-// Base routes
-app.use("/api/auth", authRoutes);   // Authentication routes 
-app.use("/api/moods", moodRoutes);  // Mood & MoodLog routes 
-app.use("/api/music", musicRoutes); // Music Recommendation routes
+// ----------------------
+// Connect Database
+// ----------------------
+connectDB();
+
+// ----------------------
+// Register Routes
+// IMPORTANT: chatbot FIRST, then /api/music
+// ----------------------
+app.use("/api/auth", authRoutes);
+app.use("/api/moods", moodRoutes);
+app.use("/api/music/chatbot", chatbotRoutes);   // <-- FIX
+app.use("/api/music", musicRoutes);             // <-- FIX order
 app.use("/api/analytics", analyticsRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/playlists", playlistRoutes);
 
-// Default route (root)
+// ----------------------
+// Root Route
+// ----------------------
 app.get("/", (req, res) => {
   res.send("MoodWave backend is running!");
 });
 
-// Set port from environment or fallback to 5000
+// ----------------------
+// Start Server
+// ----------------------
 const PORT = process.env.PORT || 5000;
 
-// Start server
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
+  console.log("✅ Express 5 server started successfully");
 });
-
-console.log("Music routes mounted successfully");
-app.use("/api/music", musicRoutes);
-
