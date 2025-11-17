@@ -1,3 +1,4 @@
+// backend/models/SavedPlaylist.js
 import mongoose from "mongoose";
 
 const savedPlaylistSchema = new mongoose.Schema(
@@ -11,22 +12,39 @@ const savedPlaylistSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    // We'll store mood NAMES as strings (e.g. ["Happy", "Calm"])
     moods: [
       {
         type: String,
+        trim: true,
       },
     ],
     songs: [
       {
-        title: String,
-        url: String,
-        thumbnail: String,
-        channelTitle: String,
+        title: { type: String, default: "" },
+        url: { type: String, default: "" },
+        thumbnail: { type: String, default: "" },
+        channelTitle: { type: String, default: "" },
       },
     ],
   },
   { timestamps: true }
 );
 
-const SavedPlaylist = mongoose.model("SavedPlaylist", savedPlaylistSchema);
+// Ensure default array values to avoid nulls
+savedPlaylistSchema.pre("save", function (next) {
+  if (!this.moods) this.moods = [];
+  if (!Array.isArray(this.moods)) {
+    // if somehow a string got through, try to convert
+    if (typeof this.moods === "string") {
+      this.moods = this.moods.split(",").map((m) => m.trim()).filter(Boolean);
+    } else {
+      this.moods = [];
+    }
+  }
+  if (!this.songs) this.songs = [];
+  next();
+});
+
+const SavedPlaylist = mongoose.models.SavedPlaylist || mongoose.model("SavedPlaylist", savedPlaylistSchema);
 export default SavedPlaylist;
