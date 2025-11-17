@@ -1,5 +1,6 @@
 // frontend/src/App.jsx
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { useEffect } from "react";
 import Navbar from "./components/Navbar";
 import Dashboard from "./pages/Dashboard";
 import DetectMood from "./pages/DetectMood";
@@ -12,6 +13,28 @@ import Register from "./pages/Register";
 import MoodLogs from "./pages/MoodLogs";
 
 export default function App() {
+  useEffect(() => {
+    // Global cleanup for webcam streams when navigating away from the app
+    const handleBeforeUnload = () => {
+      const videoElements = document.querySelectorAll('video');
+      videoElements.forEach(video => {
+        if (video.srcObject) {
+          const stream = video.srcObject;
+          const tracks = stream.getTracks();
+          tracks.forEach(track => track.stop());
+          video.srcObject = null;
+        }
+      });
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+      handleBeforeUnload(); // Cleanup on component unmount
+    };
+  }, []);
+
   return (
     <Router>
       <Navbar />

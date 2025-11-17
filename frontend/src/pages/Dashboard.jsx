@@ -1,6 +1,6 @@
 // frontend/src/pages/Dashboard.jsx
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import API from "../utils/api";
 
 export default function Dashboard() {
@@ -15,14 +15,42 @@ export default function Dashboard() {
   const [lastFetchedMood, setLastFetchedMood] = useState(null);
 
   const navigate = useNavigate();
+  const location = useLocation(); // Get location state
   const userId = localStorage.getItem("userId");
 
-  // Load moods
+  // Load moods and check for moodId in URL
   useEffect(() => {
     API.get("/moods")
       .then((res) => setMoods(res.data))
       .catch(() => setMessage("❌ Failed to load moods"));
+
+    // Check if moodId is in URL (from webcam detection redirect)
+    const urlParams = new URLSearchParams(window.location.search);
+    const moodId = urlParams.get('moodId');
+    if (moodId) {
+      // Find the mood and fetch music
+      API.get("/moods")
+        .then((res) => {
+          const mood = res.data.find(m => m._id === moodId);
+          if (mood) {
+            fetchMusic(moodId, mood.name);
+          }
+        })
+        .catch(() => {});
+    }
   }, []);
+
+  // 🆕 Handle detected mood from webcam
+  useEffect(() => {
+    if (location.state?.detectedMood && location.state?.shouldFetchMusic) {
+      const mood = location.state.detectedMood;
+      setMessage(`🎥 Webcam detected: ${mood.name}`);
+      fetchMusic(mood._id, mood.name);
+
+      // Clear state to prevent re-fetching
+      navigate(location.pathname, { replace: true, state: {} });
+    }
+  }, [location.state]);
 
   const opposites = {
     Happy: ["Sad", "Angry"],
@@ -339,3 +367,4 @@ export default function Dashboard() {
     </div>
   );
 }
+

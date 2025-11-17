@@ -5,6 +5,30 @@ export default function Navbar() {
   const userId = localStorage.getItem("userId");
 
   const handleLogout = () => {
+    // Stop any ongoing webcam streams globally
+    const videoElements = document.querySelectorAll('video');
+    videoElements.forEach(video => {
+      if (video.srcObject) {
+        const stream = video.srcObject;
+        const tracks = stream.getTracks();
+        tracks.forEach(track => {
+          console.log("Stopping track on logout:", track.label);
+          track.stop();
+        });
+        video.srcObject = null;
+      }
+    });
+
+    // Also try to stop any MediaStreamTracks that might still be running
+    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+      // This is a best-effort cleanup
+      try {
+        navigator.mediaDevices.getUserMedia({ audio: false, video: false });
+      } catch (e) {
+        // Ignore errors here
+      }
+    }
+
     localStorage.removeItem("userId");
     localStorage.removeItem("token");
     navigate("/login");
