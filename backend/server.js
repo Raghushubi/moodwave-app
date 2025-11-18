@@ -35,6 +35,7 @@ import userRoutes from "./routes/userRoutes.js";
 import playlistRoutes from "./routes/playlistRoutes.js";
 import socialRoutes from "./routes/socialRoutes.js";
 import likedSongsRoutes from "./routes/likedSongsRoutes.js";
+import adminRoutes from "./routes/adminRoutes.js";
 
 // ----------------------
 // Initialize App
@@ -64,6 +65,7 @@ app.use("/api/users", userRoutes);
 app.use("/api/playlists", playlistRoutes);
 app.use("/api/social", socialRoutes);
 app.use("/api/liked", likedSongsRoutes);
+app.use("/api/admin", adminRoutes);
 
 // ----------------------
 // Root Route

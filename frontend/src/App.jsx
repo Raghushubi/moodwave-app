@@ -12,28 +12,35 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import MoodLogs from "./pages/MoodLogs";
 import LikedSongs from "./pages/LikedSongs";
-
+import Admin from "./pages/Admin";
 
 export default function App() {
+
+  // 🔥 CLEAR ALL LOGIN STATES WHEN FRONTEND LOADS (your requirement)
   useEffect(() => {
-    // Global cleanup for webcam streams when navigating away from the app
+    localStorage.removeItem("token");
+    localStorage.removeItem("userId");
+    localStorage.removeItem("admin_token");
+  }, []);
+
+  // 🔥 Cleanup webcam streams globally when navigating away or closing tab
+  useEffect(() => {
     const handleBeforeUnload = () => {
-      const videoElements = document.querySelectorAll('video');
-      videoElements.forEach(video => {
+      const videoElements = document.querySelectorAll("video");
+      videoElements.forEach((video) => {
         if (video.srcObject) {
           const stream = video.srcObject;
-          const tracks = stream.getTracks();
-          tracks.forEach(track => track.stop());
+          stream.getTracks().forEach((track) => track.stop());
           video.srcObject = null;
         }
       });
     };
 
-    window.addEventListener('beforeunload', handleBeforeUnload);
+    window.addEventListener("beforeunload", handleBeforeUnload);
 
     return () => {
-      window.removeEventListener('beforeunload', handleBeforeUnload);
-      handleBeforeUnload(); // Cleanup on component unmount
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+      handleBeforeUnload();
     };
   }, []);
 
@@ -52,6 +59,7 @@ export default function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/mood-logs" element={<MoodLogs />} />
         <Route path="/liked" element={<LikedSongs />} />
+        <Route path="/admin" element={<Admin />} />
       </Routes>
     </Router>
   );
