@@ -9,19 +9,26 @@ const moodLogSchema = new mongoose.Schema(
       required: true,
     },
 
-    // for single-mood logs
+    // single mood
     mood: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Mood",
     },
 
-    // for multi-mood logs (combined playlists)
+    // multiple moods
     moods: [
       {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Mood",
       },
     ],
+
+    caption: {
+      type: String,
+      default: "",
+      trim: true,
+      maxlength: 250,
+    },
 
     method: {
       type: String,

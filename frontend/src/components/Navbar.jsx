@@ -58,6 +58,9 @@ export default function Navbar() {
             <Link to="/playlists" className="hover:text-yellow-300 transition-colors">
               Playlists
             </Link>
+             <Link to="/liked" className="hover:text-yellow-300 transition-colors">
+              Liked Songs
+            </Link>
             <Link to="/profile" className="hover:text-yellow-300 transition-colors">
               Profile
             </Link>

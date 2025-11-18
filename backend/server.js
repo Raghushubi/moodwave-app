@@ -1,8 +1,17 @@
 // ----------------------
 // Load Environment Variables
 // ----------------------
+// FORCE dotenv to use correct path and override dotenvx
 import dotenv from "dotenv";
-dotenv.config();
+import path from "path";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+dotenv.config({
+  path: path.join(__dirname, ".env")
+});
 
 // ----------------------
 // Import Libraries
@@ -20,12 +29,12 @@ import { connectDB } from "./config/db.js";
 // ----------------------
 import authRoutes from "./routes/authRoutes.js";
 import moodRoutes from "./routes/moodRoutes.js";
-import chatbotRoutes from "./routes/chatbotRoutes.js";
 import musicRoutes from "./routes/musicRoutes.js";
 import analyticsRoutes from "./routes/analyticsRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 import playlistRoutes from "./routes/playlistRoutes.js";
 import socialRoutes from "./routes/socialRoutes.js";
+import likedSongsRoutes from "./routes/likedSongsRoutes.js";
 
 // ----------------------
 // Initialize App
@@ -48,13 +57,13 @@ connectDB();
 // IMPORTANT: chatbot FIRST, then /api/music
 // ----------------------
 app.use("/api/auth", authRoutes);
-app.use("/api/moods", moodRoutes);
-app.use("/api/music/chatbot", chatbotRoutes);   // <-- FIX
-app.use("/api/music", musicRoutes);             // <-- FIX order
+app.use("/api/moods", moodRoutes);   
+app.use("/api/music", musicRoutes);             
 app.use("/api/analytics", analyticsRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/playlists", playlistRoutes);
 app.use("/api/social", socialRoutes);
+app.use("/api/liked", likedSongsRoutes);
 
 // ----------------------
 // Root Route

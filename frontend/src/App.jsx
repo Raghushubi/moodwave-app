@@ -11,6 +11,8 @@ import Profile from "./pages/Profile";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import MoodLogs from "./pages/MoodLogs";
+import LikedSongs from "./pages/LikedSongs";
+
 
 export default function App() {
   useEffect(() => {
@@ -49,6 +51,7 @@ export default function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/mood-logs" element={<MoodLogs />} />
+        <Route path="/liked" element={<LikedSongs />} />
       </Routes>
     </Router>
   );
