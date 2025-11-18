@@ -3,7 +3,18 @@ import User from "../models/User.js";
 
 const router = express.Router();
 
-// Fetch user info by ID
+// List all users (IDs + name + email)
+router.get("/", async (req, res) => {
+  try {
+    const users = await User.find({}, "_id name email").limit(500);
+    res.json(users);
+  } catch (err) {
+    console.error("List users error:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+// Fetch single user by ID
 router.get("/:userId", async (req, res) => {
   try {
     const user = await User.findById(req.params.userId).select("name email _id");

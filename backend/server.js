@@ -25,6 +25,7 @@ import musicRoutes from "./routes/musicRoutes.js";
 import analyticsRoutes from "./routes/analyticsRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 import playlistRoutes from "./routes/playlistRoutes.js";
+import socialRoutes from "./routes/socialRoutes.js";
 
 // ----------------------
 // Initialize App
@@ -53,6 +54,7 @@ app.use("/api/music", musicRoutes);             // <-- FIX order
 app.use("/api/analytics", analyticsRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/playlists", playlistRoutes);
+app.use("/api/social", socialRoutes);
 
 // ----------------------
 // Root Route
